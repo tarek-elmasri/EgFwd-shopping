@@ -35,7 +35,7 @@ class UserStore {
       );
 
       const query =
-        'INSERT INTO users (username, firstName, lastName, password_digest) VALUES ($1, $2, $3, $4) RETURNING username, firstName, lastName, id';
+        'INSERT INTO users ("username", "firstName", "lastName", "password_digest") VALUES ($1, $2, $3, $4) RETURNING "username", "firstName", "lastName", "id"';
 
       const result = await dbQuery(query, [
         username,
@@ -70,8 +70,8 @@ class UserStore {
       if (pass_matches) {
         const userData = {
           id: user.id,
-          firstName: user.firstname,
-          lastName: user.lastname,
+          firstName: user.firstName,
+          lastName: user.lastName,
         };
         return userData;
       } else return null;

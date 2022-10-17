@@ -1,4 +1,4 @@
-import UserStore, { User } from '../user';
+import UserStore from '../user';
 
 describe('UserStore tests', () => {
   const store = new UserStore();
@@ -16,8 +16,10 @@ describe('UserStore tests', () => {
   });
 
   it('create method to create and return user', async () => {
-    const res = await store.create('user1', 'john', 'doe', '12345');
-    expect(res.id).toBeTruthy();
+    const user = await store.create('user1', 'john', 'doe', '12345');
+    expect(user.id).toBeTruthy();
+    expect(user.firstName).toBeDefined()
+    expect(user.lastName).toEqual('doe')
   });
 
   it('authenticate to return a user with valid credentials', async () => {

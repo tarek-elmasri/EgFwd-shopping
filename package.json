@@ -5,14 +5,14 @@
   "main": "server.ts",
   "scripts": {
     "start": "node dist/server.js",
-    "build": "tsc",
+    "build": "npx tsc",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
     "test": "npm run build && db-migrate -e test reset && db-migrate -e test up && jasmine",
     "prettier": "prettier --config .prettierrc ./src/**/*.ts --write",
     "lint": "eslint"
   },
   "author": "Udacity",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "body-parser": "^1.19.0",

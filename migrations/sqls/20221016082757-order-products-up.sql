@@ -1,6 +1,6 @@
 /* Replace with your SQL commands */
 
-CREATE TABLE order_items (
+CREATE TABLE order_products (
   id SERIAL PRIMARY KEY,
   product_id INTEGER NOT NULL,
   order_id INTEGER NOT NULL, 
@@ -9,5 +9,5 @@ CREATE TABLE order_items (
   FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
-CREATE INDEX ON order_items(product_id);
-CREATE INDEX ON order_items(order_id);
+CREATE INDEX ON order_products(product_id);
+CREATE INDEX ON order_products(order_id);
