@@ -1,17 +1,23 @@
-import { Pool } from "pg";
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
 
-const {
-  DB_HOST: host,
-  DB_Name: database,
-  DB_USER: user,
-  DB_PASSWORD: password,
-} = process.env;
+dotenv.config();
+let client: Pool;
 
-const client = new Pool({
-  host,
-  database,
-  user,
-  password,
-});
+if (process.env.ENV === 'dev') {
+  client = new Pool({
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+  });
+} else {
+  client = new Pool({
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME_TEST,
+    user: process.env.DB_USER_TEST,
+    password: process.env.DB_PASSWORD_TEST,
+  });
+}
 
 export default client;
