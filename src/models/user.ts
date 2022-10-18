@@ -70,6 +70,7 @@ class UserStore {
       if (pass_matches) {
         const userData = {
           id: user.id,
+          username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
         };

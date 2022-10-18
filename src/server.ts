@@ -1,9 +1,11 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import UserStore from './models/user';
+import users_routes from './handlers/users';
+import products_routes from './handlers/products';
+import orders_routes from './handlers/order';
 
-const app: express.Application = express();
+export const app: express.Application = express();
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,6 +20,10 @@ app.use(bodyParser.json());
 app.get('/', async (req: Request, res: Response) => {
   res.send('Hello World');
 });
+
+users_routes(app);
+products_routes(app);
+orders_routes(app);
 
 app.listen(PORT, function () {
   console.log(`starting app on: ${address}`);
