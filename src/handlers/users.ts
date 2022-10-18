@@ -1,5 +1,6 @@
 import { Application, Request, Response } from 'express';
-import UserStore from '../models/user';
+import { validateBodyParams, ValidatorSchema } from '../middlewares/params_validator';
+import UserStore, { User } from '../models/user';
 import { jwtSign } from '../utils/jwt_tokens';
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {
@@ -53,10 +54,21 @@ const authUser = async (req: Request, res: Response) => {
   }
 };
 
+const createUserSchema: ValidatorSchema<User>[] = [
+  {
+    fieldName: 'username',
+    options: {required: true, type: 'string'}
+  },
+  {
+    fieldName: 'password',
+    options: { required: true, type: 'string'}
+  }
+]
+
 const users_routes = (app: Application) => {
   app.get('/users', getUsers);
   app.post('/users', createUser);
-  app.post('/users/auth', authUser);
+  app.post('/users/auth', validateBodyParams(createUserSchema) ,authUser);
 };
 
 export default users_routes;

@@ -1,6 +1,10 @@
 import { Response, Request, NextFunction } from 'express';
 import { jwtVerify } from '../../utils/jwt_tokens';
 
+/**
+ * middleware extracts headers authorization
+ * and verifying jwt token provided
+ */
 const authenticated = (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.split('Bearer ')[1];
