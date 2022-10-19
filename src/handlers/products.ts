@@ -1,7 +1,8 @@
 import { Application, Response, Request } from 'express';
 import ProductStore from '../models/product';
-import validateParams from '../middlewares/validator';
+import {bodyValidator, paramsValidator} from '../middlewares/validator';
 import { createProductSchema } from '../libs/validator/validatorSchems/products';
+import { createIdsSchema } from '../libs/validator/validatorSchems/ids';
 
 const getProducts = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -16,8 +17,9 @@ const getProducts = async (req: Request, res: Response): Promise<void> => {
 
 const showProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const productId = parseInt(req.params.id) || undefined;
-    const product = await new ProductStore().show(productId!);
+    const productId = parseInt(req.params.id)
+
+    const product = await new ProductStore().show(productId);
     if (product) res.json(product);
     else res.status(404).json({ message: 'Not Found' });
   } catch (error) {
@@ -45,8 +47,8 @@ const createProduct = async (req: Request, res: Response): Promise<void> => {
 
 const products_routes = (app: Application): void => {
   app.get('/products', getProducts);
-  app.get('/products/:id', showProduct);
-  app.post('/products', validateParams(createProductSchema), createProduct);
+  app.get('/products/:id', paramsValidator(createIdsSchema(['id'])), showProduct);
+  app.post('/products', bodyValidator(createProductSchema), createProduct);
 };
 
 export default products_routes;

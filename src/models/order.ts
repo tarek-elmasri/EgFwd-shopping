@@ -1,8 +1,9 @@
 import { dbQuery } from '../utils/db_query';
 
+export type OrderStatus = 'active' | 'completed';
 export type Order = {
   id?: number;
-  status?: 'active' | 'completed';
+  status?: OrderStatus;
   user_id?: number;
 };
 
@@ -14,43 +15,35 @@ export type OrderProduct = {
 
 class OrderStore {
   index = async (): Promise<Order[]> => {
-    try {
+    
       const query = 'SELECT * FROM orders';
       const results = await dbQuery(query);
       return results.rows;
-    } catch (error) {
-      throw new Error(
-        `Error occured while fetching order from database`,
-      );
-    }
+    
   };
 
-  show = async (id: number): Promise<Order> => {
-    try {
-      const query = 'SELECT * FROM orders WHERE "id" = ($1)';
-      const results = await dbQuery(query, [id]);
-      return results.rows[0];
-    } catch (error) {
-      throw new Error(
-        `Error occured while fetching order from database with id: ${id}`,
-      );
-    }
-  };
+  // show = async (id: number): Promise<Order> => {
+  //   try {
+  //     const query = 'SELECT * FROM orders WHERE "id" = ($1)';
+  //     const results = await dbQuery(query, [id]);
+  //     return results.rows[0];
+  //   } catch (error) {
+  //     throw new Error(
+  //       `Error occured while fetching order from database with id: ${id}`,
+  //     );
+  //   }
+  // };
 
   create = async (
     userId: number,
     status: 'active' | 'completed' = 'active',
   ): Promise<Order> => {
-    try {
+    
       const query =
         'INSERT INTO orders (user_id, status) VALUES ($1,$2) RETURNING *';
       const results = await dbQuery(query, [userId, status]);
       return results.rows[0];
-    } catch (error) {
-      throw new Error(
-        `Error occured while creating order with params userId: ${userId} & status: ${status}`,
-      );
-    }
+    
   };
 
   addProduct = async (

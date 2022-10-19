@@ -9,9 +9,9 @@ describe('OrderStore tests', () => {
     expect(store.index).toBeDefined();
   });
 
-  it('create method is defined', () => {
-    expect(store.show).toBeDefined();
-  });
+  // it('create method is defined', () => {
+  //   expect(store.show).toBeDefined();
+  // });
 
   it('create method is defined', () => {
     expect(store.create).toBeDefined();
@@ -22,13 +22,13 @@ describe('OrderStore tests', () => {
     expect(orders).toEqual([]);
   });
 
-  it('show order to return order', async () => {
-    const user = await new UserStore().create('makkah', 'mo', 'salah', '12345');
-    const newOrder = await store.create(user.id!);
-    const order = await store.show(newOrder.user_id!);
-    expect(order).toBeTruthy();
-    expect(order.id).toEqual(newOrder.id);
-  });
+  // it('show order to return order', async () => {
+  //   const user = await new UserStore().create('makkah', 'mo', 'salah', '12345');
+  //   const newOrder = await store.create(user.id!);
+  //   const order = await store.show(newOrder.user_id!);
+  //   expect(order).toBeTruthy();
+  //   expect(order.id).toEqual(newOrder.id);
+  // });
 
   it('create order with userId to return new order', async () => {
     const user = await new UserStore().create('makkah', 'mo', 'salah', '12345');

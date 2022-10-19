@@ -1,11 +1,13 @@
 import { Application, Request, Response } from 'express';
-import paramsValidator from '../middlewares/validator';
+import {bodyValidator} from '../middlewares/validator';
 import {
   authUserSchema,
   createUserSchema,
 } from '../libs/validator/validatorSchems/users';
 import UserStore from '../models/user';
 import { jwtSign } from '../utils/jwt_tokens';
+import OrderServices from '../services/orders';
+import { OrderStatus } from '../models/order';
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -56,10 +58,36 @@ const authUser = async (req: Request, res: Response) => {
   }
 };
 
+const getUserOrders = async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { status } = req.query;
+
+    if (status && !['active', 'completed'].includes(status as string))
+      throw new Error('status should be one of active or completed.');
+    
+    const orders = await new OrderServices().getOrdersByUserId(
+      userId,
+      status as OrderStatus,
+    );
+
+    res.json(orders);
+  } catch (error) {
+    res.status(422).json({
+      message: (error as Error).message,
+    });
+  }
+};
+
+const addProductToOrder = async (req: Request, res: Response) => {
+};
+
 const users_routes = (app: Application) => {
   app.get('/users', getUsers);
-  app.post('/users', paramsValidator(createUserSchema), createUser);
-  app.post('/users/auth', paramsValidator(authUserSchema), authUser);
+  app.post('/users', bodyValidator(createUserSchema), createUser);
+  app.post('/users/auth', bodyValidator(authUserSchema), authUser);
+  app.get('/users/:userId/orders', getUserOrders);
+  app.post('/users/:userId/orders', addProductToOrder);
 };
 
 export default users_routes;
