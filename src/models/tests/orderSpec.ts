@@ -1,6 +1,6 @@
-import OrderStore, { Order } from '../order';
+import OrderStore from '../order';
 import ProductStore from '../product';
-import UserStore, { User } from '../user';
+import UserStore from '../user';
 
 describe('OrderStore tests', () => {
   const store = new OrderStore();
@@ -18,7 +18,7 @@ describe('OrderStore tests', () => {
   });
 
   it('index method to return list of orders', async () => {
-    const orders = await store.index(100);
+    const orders = await store.index();
     expect(orders).toEqual([]);
   });
 

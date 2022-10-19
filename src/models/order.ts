@@ -13,21 +13,14 @@ export type OrderProduct = {
 };
 
 class OrderStore {
-  index = async (userId: number): Promise<Order[] | null> => {
+  index = async (): Promise<Order[]> => {
     try {
-      let query: string;
-      // making sure user exists
-      query = 'SELECT 1 FROM users WHERE "id" = ($1)';
-      const userExists = await dbQuery(query, [userId]);
-      if (userExists.rowCount === 0) return null;
-
-      // fetching user's orders
-      query = 'SELECT * FROM orders WHERE "user_id" = ($1)';
-      const results = await dbQuery(query, [userId]);
+      const query = 'SELECT * FROM orders';
+      const results = await dbQuery(query);
       return results.rows;
     } catch (error) {
       throw new Error(
-        `Error occured while fetching order from databas with userId; ${userId}`,
+        `Error occured while fetching order from database`,
       );
     }
   };
