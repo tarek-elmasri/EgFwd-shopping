@@ -19,7 +19,7 @@ describe('/users routes endpoints tests', () => {
   it('/users [GET] 200 with users list response', async () => {
     const res = await request.get('/users');
     expect(res.status).toBe(200);
-    expect(res.body.users).toEqual([]);
+    expect(res.body).toEqual([]);
   });
 
   it('/users [POST] 201 with user object and token response', async () => {
@@ -33,8 +33,15 @@ describe('/users routes endpoints tests', () => {
     expect(res.body.password_digest).toBeFalsy();
   });
 
-  it('/users [POST] 422 with missing params', async () => {
+  it('/users [POST] 400 with missing params', async () => {
     const res = await request.post('/users');
+    expect(res.status).toBe(400);
+  });
+
+  it('/users [POST] 400 with invalid params', async () => {
+    const res = await request
+      .post('/users')
+      .send({ ...newUserParams, username: 500 });
     expect(res.status).toBe(400);
   });
 
@@ -48,8 +55,16 @@ describe('/users routes endpoints tests', () => {
     expect(res.body.password_digest).toBeFalsy();
   });
 
-  it('/users/auth [POST] 404 with invalid or missing credetials', async () => {
+  it('/users/auth [POST] 400 if missing credetials', async () => {
     const res = await request.post('/users/auth');
+    expect(res.status).toBe(400);
+  });
+
+  it('/users/auth [POST] 404 with invalid credentials', async () => {
+    const res = await request
+      .post('/users/auth')
+      .send({ username: 'unknown', password: 'unknown' });
+
     expect(res.status).toBe(404);
   });
 });

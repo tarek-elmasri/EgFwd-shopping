@@ -13,33 +13,45 @@ export type OrderProduct = {
 };
 
 class OrderStore {
-  index = async (userId: number): Promise<Order[]> => {
+  index = async (userId: number): Promise<Order[] | null> => {
     try {
-      const query = 'SELECT * FROM orders WHERE "user_id" = ($1)';
+      let query: string;
+      // making sure user exists
+      query = 'SELECT 1 FROM users WHERE "id" = ($1)';
+      const userExists = await dbQuery(query, [userId]);
+      if (userExists.rowCount === 0) return null;
+
+      // fetching user's orders
+      query = 'SELECT * FROM orders WHERE "user_id" = ($1)';
       const results = await dbQuery(query, [userId]);
       return results.rows;
     } catch (error) {
-      throw new Error('Error occured while fetching order from database');
-    }
-  };
-
-  show = async (userId: number): Promise<Order> => {
-    try {
-      const query = 'SELECT * FROM orders WHERE orders.user_id = ($1)';
-      const results = await dbQuery(query, [userId]);
-      return results.rows[0];
-    } catch (error) {
       throw new Error(
-        `Error occured while fetching order from database with userId: ${userId} and status: active`,
+        `Error occured while fetching order from databas with userId; ${userId}`,
       );
     }
   };
 
-  create = async (userId: number): Promise<Order> => {
+  show = async (id: number): Promise<Order> => {
+    try {
+      const query = 'SELECT * FROM orders WHERE "id" = ($1)';
+      const results = await dbQuery(query, [id]);
+      return results.rows[0];
+    } catch (error) {
+      throw new Error(
+        `Error occured while fetching order from database with id: ${id}`,
+      );
+    }
+  };
+
+  create = async (
+    userId: number,
+    status: 'active' | 'completed' = 'active',
+  ): Promise<Order> => {
     try {
       const query =
         'INSERT INTO orders (user_id, status) VALUES ($1,$2) RETURNING *';
-      const results = await dbQuery(query, [userId, 'active']);
+      const results = await dbQuery(query, [userId, status]);
       return results.rows[0];
     } catch (error) {
       throw new Error(

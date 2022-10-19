@@ -37,13 +37,17 @@ class ProductStore {
   create = async (
     name: string,
     price: number,
-    category: string,
+    category?: string,
   ): Promise<Product> => {
     try {
       const query =
         'INSERT INTO products (name, price, category) VALUES($1,$2,$3) RETURNING *';
 
-      const result = await dbQuery(query, [name, price, category]);
+      const result = await dbQuery(query, [
+        name,
+        price,
+        category ? category : null,
+      ]);
 
       return result.rows[0];
     } catch (error) {

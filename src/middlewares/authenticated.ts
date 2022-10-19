@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
-import { jwtVerify } from '../../utils/jwt_tokens';
+import { jwtVerify } from '../utils/jwt_tokens';
 
 /**
  * middleware extracts headers authorization

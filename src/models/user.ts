@@ -15,7 +15,8 @@ const SALT_ROUNDS = process.env.SALT_ROUNDS;
 class UserStore {
   index = async (): Promise<User[]> => {
     try {
-      const query = 'SELECT * FROM users';
+      const query =
+        'SELECT "id", "username", "firstName", "lastName" FROM users';
       const results = await dbQuery(query);
       return results.rows;
     } catch (error) {
@@ -45,8 +46,7 @@ class UserStore {
         password_digest,
       ]);
 
-      const newUser = result.rows[0];
-      return newUser;
+      return result.rows[0];
     } catch (error) {
       throw new Error('Error occured while trying to create a user');
     }
