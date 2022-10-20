@@ -1,5 +1,5 @@
 import { Application, Request, Response } from 'express';
-import {bodyValidator} from '../middlewares/validator';
+import { bodyValidator, paramsValidator } from '../middlewares/validator';
 import {
   authUserSchema,
   createUserSchema,
@@ -8,6 +8,8 @@ import UserStore from '../models/user';
 import { jwtSign } from '../utils/jwt_tokens';
 import OrderServices from '../services/orders';
 import { OrderStatus } from '../models/order';
+import { createIdsSchema } from '../libs/validator/validatorSchems/ids';
+import orderSerializer from '../serializers/orders';
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -65,13 +67,13 @@ const getUserOrders = async (req: Request, res: Response) => {
 
     if (status && !['active', 'completed'].includes(status as string))
       throw new Error('status should be one of active or completed.');
-    
+
     const orders = await new OrderServices().getOrdersByUserId(
       userId,
       status as OrderStatus,
     );
 
-    res.json(orders);
+    res.json(orderSerializer(orders));
   } catch (error) {
     res.status(422).json({
       message: (error as Error).message,
@@ -79,15 +81,22 @@ const getUserOrders = async (req: Request, res: Response) => {
   }
 };
 
-const addProductToOrder = async (req: Request, res: Response) => {
-};
+const addProductToOrder = async (req: Request, res: Response) => {};
 
 const users_routes = (app: Application) => {
   app.get('/users', getUsers);
   app.post('/users', bodyValidator(createUserSchema), createUser);
   app.post('/users/auth', bodyValidator(authUserSchema), authUser);
-  app.get('/users/:userId/orders', getUserOrders);
-  app.post('/users/:userId/orders', addProductToOrder);
+  app.get(
+    '/users/:userId/orders',
+    paramsValidator(createIdsSchema(['userId'])),
+    getUserOrders,
+  );
+  app.post(
+    '/users/:userId/orders',
+    paramsValidator(createIdsSchema(['userId'])),
+    addProductToOrder,
+  );
 };
 
 export default users_routes;

@@ -1,4 +1,4 @@
-import { isInt } from '../../utils/numbers';
+import { isInt, isNumber } from '../../utils/numbers';
 
 interface ValidatorTypeOptions {
   string: 'string';
@@ -95,7 +95,7 @@ const validator = <T>(
     if (schemaObject.options.required && !object[key])
       pushError(key, `${key as string} is required field`);
 
-    // checking strings, booleans and numbers types
+    // checking strings and booleans types
     type = schemaObject.options.type;
     if (
       type &&
@@ -103,6 +103,10 @@ const validator = <T>(
       (type === 'string' || type === 'boolean' || type === 'number') &&
       !(typeof object[key] === type)
     )
+      pushError(key, `${key as string} must be ${type}`);
+
+    // checking step for integers
+    if (type && object[key] && type === 'number' && !isNumber(object[key]))
       pushError(key, `${key as string} must be ${type}`);
 
     // extra checking step for integers

@@ -1,5 +1,5 @@
+import { QueryResult } from 'pg';
 import { Order, OrderStatus } from '../models/order';
-import UserStore from '../models/user';
 import { dbQuery } from '../utils/db_query';
 
 class OrderServices {
@@ -7,23 +7,30 @@ class OrderServices {
     userId: number,
     status?: OrderStatus,
   ): Promise<Order[]> => {
-      let query: string
-      let queryParams: (string | number)[] = [userId];
-      
-      // ensure user exists
-      query = 'SELECT 1 FROM users WHERE "id" = ($1)'
-      const user = await dbQuery(query, queryParams)
-      if (user.rowCount === 0 ) throw new Error(`Invalid userId. No user matches id: ${userId}`)
+    let query: string;
+    let results: QueryResult<any>;
+    let queryParams: (string | number)[] = [userId];
 
-      // fetching user orders
-      query = `select * FROM orders WHERE "user_id" = ($1) ${
-        status ? 'AND "status" = ($2)' : ''
-      }`;
-      if (status) queryParams.push(status);
+    // check user exists
+    query = 'SELECT 1 FROM users WHERE "id" = ($1)';
+    results = await dbQuery(query, queryParams);
+    if (results.rowCount === 0)
+      throw new Error(`No user matches id: ${userId}`);
 
-      const results = await dbQuery(query, queryParams);
-      return results.rows;
-    
+    // fetching order
+    query = `SELECT "orders"."id", "orders"."status", "orders"."user_id", "order_products"."quantity",
+              "order_products"."order_id", "products"."id" as product_id, "products"."name", "products"."price" 
+              FROM orders 
+              INNER JOIN 
+                order_products ON "order_products"."order_id" = "orders"."id" 
+              INNER JOIN 
+                products ON "products"."id" = "order_products"."product_id" 
+              WHERE "orders"."user_id" = ($1)
+              ${status ? ' AND "orders"."status" = ($2)' : ''}
+              `;
+    if (status) queryParams.push(status);
+    results = await dbQuery(query, queryParams);
+    return results.rows;
   };
 }
 

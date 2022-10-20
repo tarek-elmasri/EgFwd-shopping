@@ -3,7 +3,7 @@ import { app } from '../../server';
 
 const request = supertest(app);
 
-fdescribe('products endpoints handler tests', () => {
+describe('products endpoints handler tests', () => {
   const newProductParams = {
     name: 'Hugo perfume',
     price: 33.99,
