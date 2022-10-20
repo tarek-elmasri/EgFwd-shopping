@@ -1,12 +1,26 @@
 import { QueryResult } from 'pg';
-import { Order, OrderStatus } from '../models/order';
+import { Order, OrderProduct, OrderStatus } from '../models/order';
+import { Product } from '../models/product';
+import orderSerializer from '../serializers/orders';
 import { dbQuery } from '../utils/db_query';
 
+type ExtendedOrderProduct = OrderProduct & {
+  product: Product;
+};
+export type ExtendedOrder = Order & {
+  order_products: ExtendedOrderProduct[];
+};
+
 class OrderServices {
-  getOrdersByUserId = async (
+  getCurrentOrderByUserId = async (userId: number): Promise<ExtendedOrder> => {
+    const results = await this.OrdersByUserId(userId, 'active');
+    return orderSerializer(results)[0];
+  };
+
+  OrdersByUserId = async (
     userId: number,
     status?: OrderStatus,
-  ): Promise<Order[]> => {
+  ): Promise<ExtendedOrder[]> => {
     let query: string;
     let results: QueryResult<any>;
     let queryParams: (string | number)[] = [userId];
@@ -30,7 +44,7 @@ class OrderServices {
               `;
     if (status) queryParams.push(status);
     results = await dbQuery(query, queryParams);
-    return results.rows;
+    return orderSerializer(results.rows);
   };
 }
 

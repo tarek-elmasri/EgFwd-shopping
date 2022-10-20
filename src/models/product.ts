@@ -9,23 +9,19 @@ export type Product = {
 
 class ProductStore {
   index = async (): Promise<Product[]> => {
-   
-      const query = 'SELECT * FROM products';
+    const query = 'SELECT * FROM products';
 
-      const results = await dbQuery(query);
+    const results = await dbQuery(query);
 
-      return results.rows;
-    
+    return results.rows;
   };
 
   show = async (productId: number): Promise<Product> => {
-    
-      const query = 'SELECT * FROM products WHERE products.id = ($1)';
+    const query = 'SELECT * FROM products WHERE products.id = ($1)';
 
-      const results = await dbQuery(query, [productId]);
+    const results = await dbQuery(query, [productId]);
 
-      return results.rows[0];
-   
+    return results.rows[0];
   };
 
   create = async (
@@ -33,18 +29,16 @@ class ProductStore {
     price: number,
     category?: string,
   ): Promise<Product> => {
-    
-      const query =
-        'INSERT INTO products (name, price, category) VALUES($1,$2,$3) RETURNING *';
+    const query =
+      'INSERT INTO products (name, price, category) VALUES($1,$2,$3) RETURNING *';
 
-      const result = await dbQuery(query, [
-        name,
-        price,
-        category ? category : null,
-      ]);
+    const result = await dbQuery(query, [
+      name,
+      price,
+      category ? category : null,
+    ]);
 
-      return result.rows[0];
-   
+    return result.rows[0];
   };
 }
 

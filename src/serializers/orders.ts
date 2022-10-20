@@ -1,13 +1,14 @@
 // TODO : create test
 
 import { Order } from '../models/order';
+import { ExtendedOrder } from '../services/orders';
 
 /**
  * mimic a serializer for joined tables of orders
  * @returns Order[]
  */
-const orderSerializer = (orderRaws: any[]): Order[] => {
-  let ordersObj: { [key: number]: Order } = {};
+const orderSerializer = (orderRaws: any[]): ExtendedOrder[] => {
+  let ordersObj: { [key: number]: ExtendedOrder } = {};
   orderRaws.forEach(raw => {
     if (!ordersObj[raw.id]) {
       ordersObj[raw.id] = {

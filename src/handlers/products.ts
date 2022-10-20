@@ -1,6 +1,6 @@
 import { Application, Response, Request } from 'express';
 import ProductStore from '../models/product';
-import {bodyValidator, paramsValidator} from '../middlewares/validator';
+import { bodyValidator, paramsValidator } from '../middlewares/validator';
 import { createProductSchema } from '../libs/validator/validatorSchems/products';
 import { createIdsSchema } from '../libs/validator/validatorSchems/ids';
 
@@ -17,7 +17,7 @@ const getProducts = async (req: Request, res: Response): Promise<void> => {
 
 const showProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const productId = parseInt(req.params.id)
+    const productId = parseInt(req.params.id);
 
     const product = await new ProductStore().show(productId);
     if (product) res.json(product);
@@ -47,7 +47,11 @@ const createProduct = async (req: Request, res: Response): Promise<void> => {
 
 const products_routes = (app: Application): void => {
   app.get('/products', getProducts);
-  app.get('/products/:id', paramsValidator(createIdsSchema(['id'])), showProduct);
+  app.get(
+    '/products/:id',
+    paramsValidator(createIdsSchema(['id'])),
+    showProduct,
+  );
   app.post('/products', bodyValidator(createProductSchema), createProduct);
 };
 

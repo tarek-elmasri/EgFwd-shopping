@@ -7,9 +7,7 @@ import {
 import UserStore from '../models/user';
 import { jwtSign } from '../utils/jwt_tokens';
 import OrderServices from '../services/orders';
-import { OrderStatus } from '../models/order';
 import { createIdsSchema } from '../libs/validator/validatorSchems/ids';
-import orderSerializer from '../serializers/orders';
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -60,20 +58,16 @@ const authUser = async (req: Request, res: Response) => {
   }
 };
 
-const getUserOrders = async (req: Request, res: Response) => {
+const getCompletedOrders = async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.userId);
-    const { status } = req.query;
 
-    if (status && !['active', 'completed'].includes(status as string))
-      throw new Error('status should be one of active or completed.');
-
-    const orders = await new OrderServices().getOrdersByUserId(
+    const orders = await new OrderServices().OrdersByUserId(
       userId,
-      status as OrderStatus,
+      'completed',
     );
 
-    res.json(orderSerializer(orders));
+    res.json(orders);
   } catch (error) {
     res.status(422).json({
       message: (error as Error).message,
@@ -81,21 +75,33 @@ const getUserOrders = async (req: Request, res: Response) => {
   }
 };
 
-const addProductToOrder = async (req: Request, res: Response) => {};
+const getCurrentOrder = async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.userId);
+
+    const order = await new OrderServices().getCurrentOrderByUserId(userId);
+
+    res.json(order);
+  } catch (error) {
+    res.status(422).json({
+      message: (error as Error).message,
+    });
+  }
+};
 
 const users_routes = (app: Application) => {
   app.get('/users', getUsers);
   app.post('/users', bodyValidator(createUserSchema), createUser);
   app.post('/users/auth', bodyValidator(authUserSchema), authUser);
   app.get(
-    '/users/:userId/orders',
+    '/users/:userId/order', // current order
     paramsValidator(createIdsSchema(['userId'])),
-    getUserOrders,
+    getCurrentOrder,
   );
-  app.post(
-    '/users/:userId/orders',
+  app.get(
+    '/users/:userId/orders', // completed orders
     paramsValidator(createIdsSchema(['userId'])),
-    addProductToOrder,
+    getCompletedOrders,
   );
 };
 
