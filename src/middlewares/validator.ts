@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import validator, { Schema } from '../libs/validator';
 
 /**
- * utilize validator library to validate body fields
+ * a middleware to utilize validator library for params validations
  *  with provided schema
  * @param schema: Schema
  *
@@ -21,7 +21,7 @@ const paramsValidator =
   };
 
 /**
- * utilize validator library to validate params
+ * a middleware to utilize validator library for body validations
  *  with provided schema
  * @param schema: Schema
  *

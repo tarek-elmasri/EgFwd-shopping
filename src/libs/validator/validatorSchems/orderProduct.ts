@@ -1,5 +1,5 @@
-import { Schema } from "..";
-import { OrderProduct } from "../../../models/order";
+import { Schema } from '..';
+import { OrderProduct } from '../../../models/order';
 
 export const createOrderProductSchema: Schema<OrderProduct> = [
   {

@@ -1,26 +1,33 @@
 import supertest from 'supertest';
 import { app } from '../../server';
+import { jwtSign } from '../../utils/jwt_tokens';
 
 const request = supertest(app);
+const userToken = jwtSign({ username: 'leomessi', password: '12345' });
 
 describe('products endpoints handler tests', () => {
   const newProductParams = {
     name: 'Hugo perfume',
-    price: 33.99,
+    price: '33.99',
     category: 'perfumes',
   };
-
-  let productId: number;
 
   it('/products [GET] 200 status with products list', async () => {
     const res = await request.get('/products');
     expect(res.statusCode).toBe(200);
     expect(res.body instanceof Array).toBeTrue();
+    expect(res.body.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('/products [POST] 401 with invalid auth headers', async () => {
+    const res = await request.post('/products');
+    expect(res.statusCode).toBe(401);
   });
 
   it('/products [POST] 400 with message and errors defined when passing invalid params', async () => {
     const res = await request
       .post('/products')
+      .set('Authorization', 'Bearer ' + userToken)
       .send({ ...newProductParams, price: 'unknown' });
 
     expect(res.statusCode).toBe(400);
@@ -29,17 +36,21 @@ describe('products endpoints handler tests', () => {
   });
 
   it('/products [POST] 201 with product information', async () => {
-    const res = await request.post('/products').send(newProductParams);
-    productId = res.body.id;
+    const res = await request
+      .post('/products')
+      .set('Authorization', 'Bearer ' + userToken)
+      .send(newProductParams);
+
     expect(res.statusCode).toBe(201);
     expect(res.body.id).toBeDefined();
     expect(res.body.name).toEqual(newProductParams.name);
+    expect(res.body.price).toEqual(33.99);
   });
 
   it('/products/:id [GET] 200 with product data', async () => {
-    const res = await request.get(`/products/${productId}`);
+    const res = await request.get(`/products/1`);
     expect(res.statusCode).toBe(200);
-    expect(res.body.name).toEqual(newProductParams.name);
+    expect(res.body.name).toEqual('iphone');
   });
 
   it('/products/:id [GET] 404 status with message', async () => {

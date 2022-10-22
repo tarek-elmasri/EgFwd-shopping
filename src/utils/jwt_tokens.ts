@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const SECRET = process.env.JWT_SECRET;
 
-export const jwtSign = (payload: Object): string => {
+export const jwtSign = (payload: Record<string, unknown>): string => {
   return jwt.sign(payload, SECRET as string, {
     algorithm: 'HS256',
   });

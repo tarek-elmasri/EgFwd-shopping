@@ -3,6 +3,14 @@ import UserStore from '../user';
 describe('UserStore tests', () => {
   const store = new UserStore();
 
+  it('index to be defined', () => {
+    expect(store.index).toBeDefined();
+  });
+
+  it('show to be defined', () => {
+    expect(store.show).toBeDefined();
+  });
+
   it('create method to be defined', () => {
     expect(store.create).toBeDefined();
   });
@@ -11,8 +19,10 @@ describe('UserStore tests', () => {
     expect(store.authenticate).toBeDefined();
   });
 
-  it('index to be defined', () => {
-    expect(store.index).toBeDefined();
+  it('index to return list of users', async () => {
+    const users = await store.index();
+    expect(users instanceof Array).toBeTrue();
+    expect(users.length).toBeGreaterThanOrEqual(2);
   });
 
   it('create method to create and return user', async () => {
@@ -20,17 +30,16 @@ describe('UserStore tests', () => {
     expect(user.id).toBeTruthy();
     expect(user.firstName).toBeDefined();
     expect(user.lastName).toEqual('doe');
+    expect(user.password).toBeFalsy();
   });
 
   it('authenticate to return a user with valid credentials', async () => {
-    await store.create('user', 'ipsuem', 'lorem', 'password');
-    const user = await store.authenticate('user', 'password');
+    const user = await store.authenticate('leomessi', '12345');
     expect(user).toBeTruthy();
   });
 
   it('authenticate to return null with invalid credentials', async () => {
-    await store.create('user3', 'jo', 'saja', '12345');
-    const user = await store.authenticate('user3', 'aaa');
+    const user = await store.authenticate('jrnymar', 'aaa');
     expect(user).toBe(null);
   });
 });

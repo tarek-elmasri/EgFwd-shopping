@@ -1,6 +1,6 @@
 import { Schema } from '..';
 
-export const idsSchema: Schema<any> = [
+export const idsSchema: Schema<Record<string, unknown>> = [
   {
     fieldName: 'id',
     options: {
@@ -17,7 +17,7 @@ export const idsSchema: Schema<any> = [
  * @returns : Schema
  */
 export const createIdsSchema = (idKeys: string[]) => {
-  let schema: Schema<any> = [];
+  const schema: Schema<Record<string, unknown>> = [];
   idKeys.forEach(idKey => {
     schema.push({
       fieldName: idKey,

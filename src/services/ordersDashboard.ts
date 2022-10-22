@@ -1,29 +1,34 @@
 import { QueryResult } from 'pg';
-import { Order, OrderProduct, OrderStatus } from '../models/order';
-import { Product } from '../models/product';
-import orderSerializer from '../serializers/orders';
+import { OrderStatus } from '../models/order';
+import orderSerializer, { ExtendedOrder } from '../serializers/orders';
 import { dbQuery } from '../utils/db_query';
 
-type ExtendedOrderProduct = OrderProduct & {
-  product: Product;
-};
-export type ExtendedOrder = Order & {
-  order_products: ExtendedOrderProduct[];
-};
+class OrderQueries {
+  activeOrder = async (userId: number): Promise<ExtendedOrder> => {
+    const result = (await this.getOrdersByUserId(userId, 'active'))[0];
 
-class OrderServices {
-  getCurrentOrderByUserId = async (userId: number): Promise<ExtendedOrder> => {
-    const results = await this.OrdersByUserId(userId, 'active');
-    return orderSerializer(results)[0];
+    // if no results returns from inner joins
+    // that means current order doesn't have products included
+    // therefore another order query is required
+    if (result) return result;
+
+    const query = 'SELECT * FROM orders WHERE "user_id" = ($1)';
+    const order = await dbQuery(query, [userId]);
+    return { ...order.rows[0], order_products: [] };
   };
 
-  OrdersByUserId = async (
+  completedOrders = async (userId: number): Promise<ExtendedOrder[]> => {
+    const results = await this.getOrdersByUserId(userId, 'completed');
+    return results;
+  };
+
+  getOrdersByUserId = async (
     userId: number,
     status?: OrderStatus,
   ): Promise<ExtendedOrder[]> => {
     let query: string;
-    let results: QueryResult<any>;
-    let queryParams: (string | number)[] = [userId];
+    let results: QueryResult;
+    const queryParams: (string | number)[] = [userId];
 
     // check user exists
     query = 'SELECT 1 FROM users WHERE "id" = ($1)';
@@ -44,8 +49,9 @@ class OrderServices {
               `;
     if (status) queryParams.push(status);
     results = await dbQuery(query, queryParams);
+
     return orderSerializer(results.rows);
   };
 }
 
-export default OrderServices;
+export default OrderQueries;

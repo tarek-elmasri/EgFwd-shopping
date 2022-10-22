@@ -11,7 +11,7 @@ import Client from '../database';
 export const dbQuery = async (
   query: string,
   params?: (string | number | null)[],
-): Promise<QueryResult<any>> => {
+): Promise<QueryResult> => {
   const connection = await Client.connect();
   const results = await connection.query(query, params);
   connection.release();

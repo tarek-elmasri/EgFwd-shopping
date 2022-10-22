@@ -14,14 +14,19 @@ const SALT_ROUNDS = process.env.SALT_ROUNDS;
 
 class UserStore {
   index = async (): Promise<User[]> => {
-    try {
-      const query =
-        'SELECT "id", "username", "firstName", "lastName" FROM users';
-      const results = await dbQuery(query);
-      return results.rows;
-    } catch (error) {
-      throw new Error('Error occured while fetching users from database');
-    }
+    const query = 'SELECT "id", "username", "firstName", "lastName" FROM users';
+    const results = await dbQuery(query);
+    return results.rows;
+  };
+
+  show = async (userId: number): Promise<User | undefined> => {
+    const query = `SELECT 
+                    "id", "username" , "firstName", "lastName" FROM users
+                  WHERE
+                    "id" = ($1)  
+                  `;
+    const results = await dbQuery(query, [userId]);
+    return results.rows[0];
   };
 
   create = async (

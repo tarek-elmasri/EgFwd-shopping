@@ -1,6 +1,4 @@
 import OrderStore from '../order';
-import ProductStore from '../product';
-import UserStore from '../user';
 
 describe('OrderStore tests', () => {
   const store = new OrderStore();
@@ -9,25 +7,37 @@ describe('OrderStore tests', () => {
     expect(store.index).toBeDefined();
   });
 
-  // it('create method is defined', () => {
-  //   expect(store.show).toBeDefined();
-  // });
+  it('show method is defined', () => {
+    expect(store.show).toBeDefined();
+  });
 
   it('create method is defined', () => {
     expect(store.create).toBeDefined();
   });
 
+  it('addProduct method is defined', () => {
+    expect(store.addProduct).toBeDefined();
+  });
+
   it('index method to return list of orders', async () => {
     const orders = await store.index();
-    expect(orders).toEqual([]);
+    expect(orders instanceof Array).toBeTrue();
+    expect(orders.length).toEqual(5);
+  });
+
+  it('show method to return order', async () => {
+    const order = await store.show(1);
+    expect(order).toBeDefined();
+    expect(order?.id).toEqual(1);
+    expect(order?.user_id).toBeDefined();
+    expect(order?.status).toBeDefined();
   });
 
   it('create order with userId to return new order', async () => {
-    const user = await new UserStore().create('makkah', 'mo', 'salah', '12345');
-
-    const order = await store.create(user.id!);
-    expect(order).toBeTruthy();
+    const order = await store.create(1);
+    expect(order).toBeDefined();
     expect(order.status).toEqual('active');
+    expect(order.user_id).toBe(1);
   });
 
   it('create order to throw error with invalid userId', async () => {
@@ -41,18 +51,31 @@ describe('OrderStore tests', () => {
   });
 
   it('addProduct to return an order_product new record', async () => {
-    const user = await new UserStore().create(
-      'mosalah',
-      'mo',
-      'salah',
-      '12345',
+    const productId = 1;
+    const orderId = 2;
+    const quantity = 2;
+    const orderProduct = await store.addProduct(orderId, productId, quantity);
+    expect(orderProduct).toBeDefined();
+    expect(orderProduct.order_id).toEqual(orderId);
+    expect(orderProduct.quantity).toEqual(quantity);
+    expect(orderProduct.product_id).toEqual(productId);
+  });
+
+  it('addProduct to throw error with invalid orderId', async () => {
+    await expectAsync(store.addProduct(100, 1, 1)).toBeRejectedWithError(
+      'No order matches orderId: 100',
     );
-    const product = await new ProductStore().create('PS5', 1000, 'games');
-    const order = await store.create(user.id!);
-    const orderProduct = await store.addProduct(order.id!, product.id!, 1);
-    expect(orderProduct).toBeTruthy();
-    expect(orderProduct.order_id).toEqual(order.id);
-    expect(orderProduct.quantity).toEqual(1);
-    expect(orderProduct.product_id).toEqual(product.id);
+  });
+
+  it('addProduct to throw error with invalid productId', async () => {
+    await expectAsync(store.addProduct(1, 100, 1)).toBeRejectedWithError(
+      'No product matches productId: 100',
+    );
+  });
+
+  it('addProduct to throw error with invalid quantity', async () => {
+    await expectAsync(store.addProduct(1, 1, -10)).toBeRejectedWithError(
+      'Invalid quantity',
+    );
   });
 });

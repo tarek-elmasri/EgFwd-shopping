@@ -6,21 +6,29 @@ import {
 } from '../libs/validator/validatorSchems/users';
 import UserStore from '../models/user';
 import { jwtSign } from '../utils/jwt_tokens';
-import OrderServices from '../services/orders';
-import { createIdsSchema } from '../libs/validator/validatorSchems/ids';
+import { idsSchema } from '../libs/validator/validatorSchems/ids';
+import authenticated from '../middlewares/authenticated';
 
-const getUsers = async (req: Request, res: Response): Promise<void> => {
+const index = async (_req: Request, res: Response): Promise<void> => {
   try {
     const users = await new UserStore().index();
     res.status(200).json(users);
   } catch (error) {
-    res.status(422).json({
-      message: (error as Error).message,
-    });
+    res.status(422).json({ message: (error as Error).message });
   }
 };
 
-const createUser = async (req: Request, res: Response): Promise<void> => {
+const show = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id);
+    const user = await new UserStore().show(userId);
+    res.json(user);
+  } catch (error) {
+    res.status(422).json({ message: (error as Error).message });
+  }
+};
+
+const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, firstName, lastName, password } = req.body;
 
@@ -35,74 +43,34 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({ ...user, token });
   } catch (error) {
-    res.status(422).json({
-      message: (error as Error).message,
-    });
+    res.status(422).json({ message: (error as Error).message });
   }
 };
-const authUser = async (req: Request, res: Response) => {
+
+const auth = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body;
 
     const user = await new UserStore().authenticate(username, password);
 
-    if (user) res.status(200).json(user);
-    else
+    if (user) {
+      const token = jwtSign(user);
+      res.status(200).json({ ...user, token });
+    } else {
       res.status(404).json({
         message: 'No User Found',
       });
+    }
   } catch (error) {
-    res.status(422).json({
-      message: (error as Error).message,
-    });
-  }
-};
-
-const getCompletedOrders = async (req: Request, res: Response) => {
-  try {
-    const userId = parseInt(req.params.userId);
-
-    const orders = await new OrderServices().OrdersByUserId(
-      userId,
-      'completed',
-    );
-
-    res.json(orders);
-  } catch (error) {
-    res.status(422).json({
-      message: (error as Error).message,
-    });
-  }
-};
-
-const getCurrentOrder = async (req: Request, res: Response) => {
-  try {
-    const userId = parseInt(req.params.userId);
-
-    const order = await new OrderServices().getCurrentOrderByUserId(userId);
-
-    res.json(order);
-  } catch (error) {
-    res.status(422).json({
-      message: (error as Error).message,
-    });
+    res.status(422).json({ message: (error as Error).message });
   }
 };
 
 const users_routes = (app: Application) => {
-  app.get('/users', getUsers);
-  app.post('/users', bodyValidator(createUserSchema), createUser);
-  app.post('/users/auth', bodyValidator(authUserSchema), authUser);
-  app.get(
-    '/users/:userId/order', // current order
-    paramsValidator(createIdsSchema(['userId'])),
-    getCurrentOrder,
-  );
-  app.get(
-    '/users/:userId/orders', // completed orders
-    paramsValidator(createIdsSchema(['userId'])),
-    getCompletedOrders,
-  );
+  app.get('/users', authenticated, index);
+  app.get('/users/:id', authenticated, paramsValidator(idsSchema), show);
+  app.post('/users', bodyValidator(createUserSchema), create);
+  app.post('/users/auth', bodyValidator(authUserSchema), auth);
 };
 
 export default users_routes;

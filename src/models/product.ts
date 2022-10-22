@@ -16,7 +16,7 @@ class ProductStore {
     return results.rows;
   };
 
-  show = async (productId: number): Promise<Product> => {
+  show = async (productId: number): Promise<Product | undefined> => {
     const query = 'SELECT * FROM products WHERE products.id = ($1)';
 
     const results = await dbQuery(query, [productId]);

@@ -21,13 +21,11 @@ type ValidatorSchema<T> = {
 
 type ValidatorResult = {
   isValid: boolean;
-  errors: {
-    [key: string]: string[];
-  } | null;
+  errors: Record<string, string[]> | null;
 };
 
 type ValidatorObject = {
-  [key: symbol | string]: any;
+  [key: string]: string | number;
 };
 
 /**
@@ -74,9 +72,7 @@ const validator = <T>(
   object: ValidatorObject,
   schema: Schema<T>,
 ): ValidatorResult => {
-  let errors: {
-    [key: string]: string[];
-  } = {};
+  const errors: Record<string, string[]> = {};
 
   let key: keyof T;
   let type: keyof ValidatorTypeOptions | undefined;
@@ -92,25 +88,35 @@ const validator = <T>(
   schema.forEach((schemaObject: ValidatorSchema<T>) => {
     // checking fieldname absence in object if required
     key = schemaObject.fieldName;
-    if (schemaObject.options.required && !object[key])
+    if (schemaObject.options.required && !object[key as string])
       pushError(key, `${key as string} is required field`);
 
     // checking strings and booleans types
     type = schemaObject.options.type;
     if (
       type &&
-      object[key] &&
-      (type === 'string' || type === 'boolean' || type === 'number') &&
-      !(typeof object[key] === type)
+      object[key as string] &&
+      (type === 'string' || type === 'boolean') &&
+      !(typeof object[key as string] === type)
     )
       pushError(key, `${key as string} must be ${type}`);
 
-    // checking step for integers
-    if (type && object[key] && type === 'number' && !isNumber(object[key]))
+    // checking step for numbers
+    if (
+      type &&
+      object[key as string] &&
+      type === 'number' &&
+      !isNumber(object[key as string] as unknown as string)
+    )
       pushError(key, `${key as string} must be ${type}`);
 
     // extra checking step for integers
-    if (type && object[key] && type === 'integer' && !isInt(object[key]))
+    if (
+      type &&
+      object[key as string] &&
+      type === 'integer' &&
+      !isInt(object[key as string] as unknown as string)
+    )
       pushError(key, `${key as string} must be ${type}`);
   });
 

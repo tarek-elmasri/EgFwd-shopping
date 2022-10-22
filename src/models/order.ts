@@ -21,12 +21,18 @@ class OrderStore {
     return results.rows;
   };
 
+  show = async (orderId: number): Promise<Order | undefined> => {
+    const query = 'SELECT * FROM orders WHERE id = ($1)';
+    const results = await dbQuery(query, [orderId]);
+    return results.rows[0];
+  };
+
   create = async (
     userId: number,
-    status: 'active' | 'completed' = 'active',
+    status: OrderStatus = 'active',
   ): Promise<Order> => {
     let query: string;
-    let results: QueryResult<any>;
+    let results: QueryResult;
     // ensure user exists
     query = 'SELECT 1 FROM users WHERE "id" = ($1)';
     results = await dbQuery(query, [userId]);
@@ -45,7 +51,7 @@ class OrderStore {
     quantity: number,
   ): Promise<OrderProduct> => {
     let query: string;
-    let results: QueryResult<any>;
+    let results: QueryResult;
 
     // check order exists
     query = 'SELECT 1 FROM orders WHERE "id" = ($1)';
