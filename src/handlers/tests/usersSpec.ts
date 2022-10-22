@@ -1,10 +1,13 @@
 import supertest from 'supertest';
 import { app } from '../../server';
-import { jwtSign } from '../../utils/jwt_tokens';
 
 const request = supertest(app);
-const userToken = jwtSign({ username: 'leomessi', password: '12345' });
 
+const getToken = async (): Promise<string> => {
+  const credentials = { username: 'leomessi', password: '12345' };
+  const res = await request.post('/users/auth').send(credentials);
+  return res.body.token;
+};
 describe('/users routes endpoints tests', () => {
   const newUserParams = {
     username: 'mosalah',
@@ -26,7 +29,7 @@ describe('/users routes endpoints tests', () => {
   it('/users [GET] 200 with users list response', async () => {
     const res = await request
       .get('/users')
-      .set('Authorization', 'Bearer ' + userToken);
+      .set('Authorization', 'Bearer ' + (await getToken()));
 
     expect(res.status).toBe(200);
     expect(res.body instanceof Array).toBeTrue();
@@ -41,7 +44,7 @@ describe('/users routes endpoints tests', () => {
   it('/users/id [GET] 200 with required user object', async () => {
     const res = await request
       .get('/users/1')
-      .set('Authorization', 'Bearer ' + userToken);
+      .set('Authorization', 'Bearer ' + (await getToken()));
 
     expect(res.status).toBe(200);
     expect(res.body.id).toBeDefined();

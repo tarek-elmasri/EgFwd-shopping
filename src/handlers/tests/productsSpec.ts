@@ -1,9 +1,12 @@
 import supertest from 'supertest';
 import { app } from '../../server';
-import { jwtSign } from '../../utils/jwt_tokens';
 
 const request = supertest(app);
-const userToken = jwtSign({ username: 'leomessi', password: '12345' });
+const getToken = async (): Promise<string> => {
+  const credentials = { username: 'leomessi', password: '12345' };
+  const res = await request.post('/users/auth').send(credentials);
+  return res.body.token;
+};
 
 describe('products endpoints handler tests', () => {
   const newProductParams = {
@@ -27,7 +30,7 @@ describe('products endpoints handler tests', () => {
   it('/products [POST] 400 with message and errors defined when passing invalid params', async () => {
     const res = await request
       .post('/products')
-      .set('Authorization', 'Bearer ' + userToken)
+      .set('Authorization', 'Bearer ' + (await getToken()))
       .send({ ...newProductParams, price: 'unknown' });
 
     expect(res.statusCode).toBe(400);
@@ -38,7 +41,7 @@ describe('products endpoints handler tests', () => {
   it('/products [POST] 201 with product information', async () => {
     const res = await request
       .post('/products')
-      .set('Authorization', 'Bearer ' + userToken)
+      .set('Authorization', 'Bearer ' + (await getToken()))
       .send(newProductParams);
 
     expect(res.statusCode).toBe(201);
