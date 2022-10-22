@@ -1,8 +1,8 @@
-### Shopping App
+# Shopping App
 
 a basic RESTfull shopping api built with node.js and express
 
-### Installation
+## Installation
 
 - clone repository to your local maching and install dependencies:
 
@@ -38,9 +38,9 @@ npm run dbseed
 npm start
 ```
 
-### Api Endpoints
+## Api Endpoints
 
-# Users:
+### Users:
 
 - "/users" [POST] -> create new user and return user data and a token.
   required data: {
@@ -57,7 +57,7 @@ npm start
 
 - "/users/:id" [GET] : [token required], -> return user data.
 
-# Products:
+### Products:
 
 - "/products" [GET] -> get list of all products.
 - "products/:id" [GET] -> get product referring to the id.
@@ -70,7 +70,7 @@ npm start
 - "/products-services/by-category?category='category'" [GET] -> to get products belongs to specific category. if no category is passed in query it will return all products ordered by category
 - "/products-services/most-popular" [GET] -> get heighest top 5 sold product
 
-# Orders:
+### Orders:
 
 - "/orders/:order_id/products" [POST] -> to add product into an order.
   required data: {
@@ -82,7 +82,7 @@ npm start
 
 - "/order-services/orders-by-user-id/:userId/completed" [GET] [token required] -> return only completed orders that belongs to given user id.
 
-### Testing
+## Testing
 
 make sure a database for testing is already created and referred in `.env` before running script.
 
@@ -90,7 +90,7 @@ make sure a database for testing is already created and referred in `.env` befor
 ENV=test npm run test
 ```
 
-### Available scripts:
+## Available scripts:
 
 - `start`: start transpiled version.
 - `watch`: start in watch mode for ts.
