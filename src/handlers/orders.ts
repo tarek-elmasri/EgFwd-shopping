@@ -1,6 +1,7 @@
 import { Application, Response, Request } from 'express';
 import { createIdsSchema } from '../libs/validator/validatorSchems/ids';
 import { createOrderProductSchema } from '../libs/validator/validatorSchems/orderProduct';
+import authenticated from '../middlewares/authenticated';
 import { bodyValidator, paramsValidator } from '../middlewares/validator';
 import OrderStore from '../models/order';
 
@@ -24,6 +25,7 @@ const addProduct = async (req: Request, res: Response): Promise<void> => {
 const ordersRoutes = (app: Application): void => {
   app.post(
     '/orders/:order_id/products',
+    authenticated,
     paramsValidator(createIdsSchema(['order_id'])),
     bodyValidator(createOrderProductSchema),
     addProduct,
