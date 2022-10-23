@@ -27,15 +27,15 @@ describe('/orders endpoints handler tests', () => {
     expect(res.body.order_id).toEqual(3);
   });
 
-  it('/:order_id/products [POST] 400 status with invalid order_id params', async () => {
+  it('/:order_id/products [POST] 422 status with invalid order_id params', async () => {
     const res = await request
       .post('/orders/cc/products')
       .set('Authorization', 'Bearer ' + (await getToken()))
       .send({ product_id: 1, quantity: 10 });
 
-    expect(res.status).toEqual(400);
+    expect(res.status).toEqual(422);
   });
-
+  
   it("/:order_id/products [POST] 422 when product deosn't exist", async () => {
     const res = await request
       .post('/orders/3/products')

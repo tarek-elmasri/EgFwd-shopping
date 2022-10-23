@@ -1,12 +1,14 @@
 import { Schema } from '..';
-import { OrderProduct } from '../../../models/order';
+import OrderStore, { OrderProduct } from '../../../models/order';
+import ProductStore from '../../../models/product';
 
-export const createOrderProductSchema: Schema<OrderProduct> = [
+export const createOrderProductBodySchema: Schema<OrderProduct> = [
   {
     fieldName: 'product_id',
     options: {
       required: true,
       type: 'integer',
+      recordExists: async(id: number) => (!!await new ProductStore().show(id))
     },
   },
   {
@@ -17,3 +19,14 @@ export const createOrderProductSchema: Schema<OrderProduct> = [
     },
   },
 ];
+
+export const createOrderProductParamsSchema: Schema<OrderProduct> = [
+  {
+    fieldName: 'order_id',
+    options: {
+      required: true,
+      type: 'integer',
+      recordExists: async(id: number)=> (!! await new OrderStore().show(id))
+    }
+  }
+]

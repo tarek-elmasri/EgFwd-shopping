@@ -11,7 +11,7 @@ const productsByCategory = async (req: Request, res: Response) => {
 
     res.json(products);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -20,7 +20,7 @@ const mostPopular = async (req: Request, res: Response) => {
     const products = await new ProductsServices().mostPopular();
     res.json(products);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 

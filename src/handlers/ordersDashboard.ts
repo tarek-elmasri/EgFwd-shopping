@@ -1,60 +1,59 @@
 import { Application, Request, Response } from 'express';
-import { createIdsSchema } from '../libs/validator/validatorSchems/ids';
+import { ordersDashboardParamsSchema } from '../libs/validator/validatorSchems/ordersDashboard';
 import authenticated from '../middlewares/authenticated';
 import { paramsValidator } from '../middlewares/validator';
 import UserService from '../services/ordersDashboard';
 
 const userOrders = async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.user_id);
     const orders = await new UserService().getOrdersByUserId(userId);
     res.json(orders);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
 const userCurrentOrder = async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.user_id);
     const order = await new UserService().activeOrder(userId);
     if (order) res.json(order);
     else
       res.status(404).json({ message: 'No active attached to this user yet' });
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
 const userCompletedOrders = async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.user_id);
     const orders = await new UserService().completedOrders(userId);
     res.json(orders);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
 const ordersDashboardRoutes = (app: Application) => {
-  const userIdSchema = createIdsSchema(['userId']);
 
   app.get(
-    '/order-services/orders-by-user-id/:userId',
+    '/order-services/orders-by-user-id/:user_id',
     authenticated,
-    paramsValidator(userIdSchema),
+    paramsValidator(ordersDashboardParamsSchema),
     userOrders,
   );
   app.get(
-    '/order-services/orders-by-user-id/:userId/active',
+    '/order-services/orders-by-user-id/:user_id/active',
     authenticated,
-    paramsValidator(userIdSchema),
+    paramsValidator(ordersDashboardParamsSchema),
     userCurrentOrder,
   );
   app.get(
-    '/order-services/orders-by-user-id/:userId/completed',
+    '/order-services/orders-by-user-id/:user_id/completed',
     authenticated,
-    paramsValidator(userIdSchema),
+    paramsValidator(ordersDashboardParamsSchema),
     userCompletedOrders,
   );
 };

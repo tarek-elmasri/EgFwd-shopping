@@ -10,7 +10,7 @@ const index = async (_req: Request, res: Response): Promise<void> => {
     const products = await new ProductStore().index();
     res.json(products);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -22,7 +22,7 @@ const show = async (req: Request, res: Response): Promise<void> => {
     if (product) res.json(product);
     else res.status(404).json({ message: 'Not Found' });
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -36,7 +36,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
     );
     res.status(201).json(newProduct);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 

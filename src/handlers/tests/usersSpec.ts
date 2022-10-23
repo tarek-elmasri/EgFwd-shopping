@@ -70,11 +70,11 @@ describe('/users routes endpoints tests', () => {
     expect(res.body.message).toBeDefined();
   });
 
-  it('/users [POST] 400 with invalid params', async () => {
+  it('/users [POST] 422 with invalid params', async () => {
     const res = await request
       .post('/users')
       .send({ ...newUserParams, username: 500 });
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     expect(res.body.errors).toBeDefined();
     expect(res.body.message).toBeDefined();
   });

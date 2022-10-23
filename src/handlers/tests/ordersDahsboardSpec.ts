@@ -32,7 +32,7 @@ describe('/order-services endpoint tests', () => {
         .set('Authorization', 'Bearer ' + (await getToken()));
 
       expect(res.status).toBe(422);
-      expect(res.body.message).toEqual('No user matches id: 100');
+      expect(res.body.message).toEqual('Unprocessable Entity');
     });
 
     it('orders belongs to provided user_id', async () => {

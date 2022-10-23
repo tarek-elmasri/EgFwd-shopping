@@ -14,7 +14,7 @@ const index = async (_req: Request, res: Response): Promise<void> => {
     const users = await new UserStore().index();
     res.status(200).json(users);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -24,7 +24,7 @@ const show = async (req: Request, res: Response): Promise<void> => {
     const user = await new UserStore().show(userId);
     res.json(user);
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -43,7 +43,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({ ...user, token });
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -62,7 +62,7 @@ const auth = async (req: Request, res: Response): Promise<void> => {
       });
     }
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 

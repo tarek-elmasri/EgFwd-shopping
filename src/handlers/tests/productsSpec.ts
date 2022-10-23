@@ -27,13 +27,13 @@ describe('products endpoints handler tests', () => {
     expect(res.statusCode).toBe(401);
   });
 
-  it('/products [POST] 400 with message and errors defined when passing invalid params', async () => {
+  it('/products [POST] 422 with message and errors defined when passing invalid params', async () => {
     const res = await request
       .post('/products')
       .set('Authorization', 'Bearer ' + (await getToken()))
       .send({ ...newProductParams, price: 'unknown' });
 
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(422);
     expect(res.body.message).toBeDefined();
     expect(res.body.errors).toBeDefined();
   });

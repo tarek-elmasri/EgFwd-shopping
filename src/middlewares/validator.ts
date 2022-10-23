@@ -9,15 +9,16 @@ import validator, { Schema } from '../libs/validator';
  */
 const paramsValidator =
   <T>(schema: Schema<T>) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    const { errors, isValid } = validator(req.params, schema);
+  async(req: Request, res: Response, next: NextFunction) => {
+    const { errors, isValid, hasMissingParams } = await validator(req.params, schema);
 
     if (isValid) next();
-    else
+    else hasMissingParams ?
       res.status(400).json({
         message: 'Bad Parameter',
         errors,
-      });
+      }) :
+      res.status(422).json({message: 'Unprocessable Entity' , errors})
   };
 
 /**
@@ -28,15 +29,16 @@ const paramsValidator =
  */
 const bodyValidator =
   <T>(schema: Schema<T>) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    const { errors, isValid } = validator(req.body, schema);
+  async(req: Request, res: Response, next: NextFunction) => {
+    const { errors, isValid ,hasMissingParams } = await validator(req.body, schema);
 
     if (isValid) next();
-    else
+    else hasMissingParams ?
       res.status(400).json({
         message: 'Bad Parameter',
         errors,
-      });
+      }) : 
+      res.status(422).json({message: 'Unprocessable Entity' , errors})
   };
 export { paramsValidator, bodyValidator };
 
