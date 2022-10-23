@@ -18,7 +18,32 @@ npm install
 npm i -g db-migrate
 ```
 
-- create database for both dev and test environment manually.
+- connect to the default postgres database as the server's root user `psql -U postgres`.
+- create a new user by running this command:
+
+```
+CREATE USER shopping_user WITH PASSWORD 'password'
+```
+
+- create database for both dev and test environment by following command:
+
+```
+CREATE DATABASE shopping_dev;
+CREATE DATABASE shopping_test;
+```
+
+- connect to the database and grant all privileges to new user;
+
+```
+  \c shopping_dev;
+  GRANT ALL PREIVILEGES ON DATABASE shopping_dev TO shopping_user;
+  \c shopping_test;
+  GRANT ALL PREIVILEGES ON DATABASE shopping_test TO shopping_user;
+
+```
+
+- database should be running on default psql port: `5432`
+- server will be running on port: `3000` unless changed in `.env` file.
 - create `.env` file and match fields with `.env-example` fields and referring to database information.
 - migrate database schema:
 
