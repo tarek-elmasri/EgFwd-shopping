@@ -32,7 +32,7 @@
 
 ### Orders:
 
-- "/orders/:order_id/products" [POST] -> to add product into an order.
+- "/orders/:order_id/products" [POST] [token required] -> to add product into an order.
   required data: {
   product_id: number
   }
