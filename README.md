@@ -26,7 +26,7 @@ npm i -g db-migrate
 - create a new user by running this command:
 
 ```
-CREATE USER shopping_user WITH PASSWORD 'password'
+CREATE USER shopping_user WITH PASSWORD 'password';
 ```
 
 - create database for both dev and test environment by following command:
@@ -40,9 +40,9 @@ CREATE DATABASE shopping_test;
 
 ```
   \c shopping_dev;
-  GRANT ALL PREIVILEGES ON DATABASE shopping_dev TO shopping_user;
+  GRANT ALL PRIVILEGES ON DATABASE shopping_dev TO shopping_user;
   \c shopping_test;
-  GRANT ALL PREIVILEGES ON DATABASE shopping_test TO shopping_user;
+  GRANT ALL PRIVILEGES ON DATABASE shopping_test TO shopping_user;
 
 ```
 
