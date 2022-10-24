@@ -12,7 +12,7 @@ type Schema<T> = ValidatorSchema<T>[];
 type ValidatorOption = {
   required?: boolean;
   type?: keyof ValidatorTypeOptions;
-  recordExists?: (id: number)=> Promise<boolean>
+  recordExists?: (id: number) => Promise<boolean>;
 };
 
 type ValidatorSchema<T> = {
@@ -22,7 +22,7 @@ type ValidatorSchema<T> = {
 
 type ValidatorResult = {
   isValid: boolean;
-  hasMissingParams: boolean
+  hasMissingParams: boolean;
   errors: Record<string, string[]> | null;
 };
 
@@ -70,12 +70,12 @@ type ValidatorObject = {
  * @param schema: Schema<T> // takes a generic model type
  * @returns ValidatorResult
  */
-const validator = async<T>(
+const validator = async <T>(
   object: ValidatorObject,
   schema: Schema<T>,
 ): Promise<ValidatorResult> => {
   const errors: Record<string, string[]> = {};
-  let hasMissingParams = false
+  let hasMissingParams = false;
 
   let key: keyof T;
   let type: keyof ValidatorTypeOptions | undefined;
@@ -89,14 +89,14 @@ const validator = async<T>(
 
   // mapping schema options
   //schema.forEach((schemaObject: ValidatorSchema<T>) => {
-    let schemaObject: ValidatorSchema<T>
-  for (schemaObject of schema){
+  let schemaObject: ValidatorSchema<T>;
+  for (schemaObject of schema) {
     // checking fieldname absence in object if required
     key = schemaObject.fieldName;
-    if (schemaObject.options.required && !object[key as string]){
+    if (schemaObject.options.required && !object[key as string]) {
       pushError(key, `${key as string} is required field`);
-      hasMissingParams = true
-      continue
+      hasMissingParams = true;
+      continue;
     }
 
     // checking strings and booleans types
@@ -126,16 +126,13 @@ const validator = async<T>(
       !isInt(object[key as string] as unknown as string)
     )
       pushError(key, `${key as string} must be ${type}`);
-      
+
     // recordExists check
-    const recordExists = schemaObject.options.recordExists 
-    const targetId = object[schemaObject.fieldName] as number
-    if (recordExists && (isInt(targetId)) && !(await recordExists(targetId)))
-      pushError(key, `${key as string} must be ${type}`);
-
+    const recordExists = schemaObject.options.recordExists;
+    const targetId = object[schemaObject.fieldName] as number;
+    if (recordExists && isInt(targetId) && !(await recordExists(targetId)))
+      pushError(key, `No record matches id: ${targetId}`);
   }
-
-  
 
   // formatting result
   const isValid = Object.keys(errors).length === 0;
