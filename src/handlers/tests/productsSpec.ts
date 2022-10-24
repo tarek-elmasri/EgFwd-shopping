@@ -2,13 +2,16 @@ import supertest from 'supertest';
 import { app } from '../../server';
 
 const request = supertest(app);
-const getToken = async (): Promise<string> => {
-  const credentials = { username: 'leomessi', password: '12345' };
-  const res = await request.post('/users/auth').send(credentials);
-  return res.body.token;
-};
 
 describe('products endpoints handler tests', () => {
+  let token: string;
+
+  beforeAll(async () => {
+    const credentials = { username: 'leomessi', password: '12345' };
+    const res = await request.post('/users/auth').send(credentials);
+    token = res.body.token;
+  });
+
   const newProductParams = {
     name: 'Hugo perfume',
     price: '33.99',
@@ -30,7 +33,7 @@ describe('products endpoints handler tests', () => {
   it('/products [POST] 422 with message and errors defined when passing invalid params', async () => {
     const res = await request
       .post('/products')
-      .set('Authorization', 'Bearer ' + (await getToken()))
+      .set('Authorization', 'Bearer ' + token)
       .send({ ...newProductParams, price: 'unknown' });
 
     expect(res.statusCode).toBe(422);
@@ -41,7 +44,7 @@ describe('products endpoints handler tests', () => {
   it('/products [POST] 201 with product information', async () => {
     const res = await request
       .post('/products')
-      .set('Authorization', 'Bearer ' + (await getToken()))
+      .set('Authorization', 'Bearer ' + token)
       .send(newProductParams);
 
     expect(res.statusCode).toBe(201);

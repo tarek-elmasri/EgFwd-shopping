@@ -3,12 +3,15 @@ import { app } from '../../server';
 
 const request = supertest(app);
 
-const getToken = async (): Promise<string> => {
-  const credentials = { username: 'leomessi', password: '12345' };
-  const res = await request.post('/users/auth').send(credentials);
-  return res.body.token;
-};
 describe('/users routes endpoints tests', () => {
+  let token: string;
+
+  beforeAll(async () => {
+    const credentials = { username: 'leomessi', password: '12345' };
+    const res = await request.post('/users/auth').send(credentials);
+    token = res.body.token;
+  });
+
   const newUserParams = {
     username: 'mosalah',
     firstName: 'mo',
@@ -29,7 +32,7 @@ describe('/users routes endpoints tests', () => {
   it('/users [GET] 200 with users list response', async () => {
     const res = await request
       .get('/users')
-      .set('Authorization', 'Bearer ' + (await getToken()));
+      .set('Authorization', 'Bearer ' + token);
 
     expect(res.status).toBe(200);
     expect(res.body instanceof Array).toBeTrue();
@@ -44,7 +47,7 @@ describe('/users routes endpoints tests', () => {
   it('/users/id [GET] 200 with required user object', async () => {
     const res = await request
       .get('/users/1')
-      .set('Authorization', 'Bearer ' + (await getToken()));
+      .set('Authorization', 'Bearer ' + token);
 
     expect(res.status).toBe(200);
     expect(res.body.id).toBeDefined();
